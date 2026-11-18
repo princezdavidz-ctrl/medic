@@ -33,7 +33,7 @@ jobs:
         with:
           repository: princezdavidz-ctrl/medical2
           token: ${{ secrets.movement }}
-          path: /tmp/medical2
+          path: .source/medical2
           fetch-depth: 1
 
       - name: Checkout doctor source
@@ -41,7 +41,7 @@ jobs:
         with:
           repository: princezdavidz-ctrl/doctor-review-dashboard
           token: ${{ secrets.movement }}
-          path: /tmp/doctor-review-dashboard
+          path: .source/doctor-review-dashboard
           fetch-depth: 1
 
       - name: Checkout admin source
@@ -49,7 +49,7 @@ jobs:
         with:
           repository: princezdavidz-ctrl/medical
           token: ${{ secrets.movement }}
-          path: /tmp/medical
+          path: .source/medical
           fetch-depth: 1
 
       - name: Import into Patient, Doctors, and Admin
@@ -57,9 +57,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p Patient Doctors Admin
-          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/medical2/ Patient/
-          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/doctor-review-dashboard/ Doctors/
-          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/medical/ Admin/
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle'  .source/medical2/ Patient/
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle'  .source/doctor-review-dashboard/ Doctors/
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle'  .source/medical/ Admin/
 
       - name: Validate imported applications
         shell: bash
