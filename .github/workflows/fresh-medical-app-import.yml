@@ -1,0 +1,72 @@
+name: Fresh medical app import
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: medical-app-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout destination repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Clone source repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/princezdavidz-ctrl/medical2.git /tmp/medical2
+          git clone --depth 1 https://github.com/princezdavidz-ctrl/doctor-review-dashboard.git /tmp/doctor-review-dashboard
+          git clone --depth 1 https://github.com/princezdavidz-ctrl/medical.git /tmp/medical
+
+      - name: Import into Patient, Doctors, and Admin
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p Patient Doctors Admin
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/medical2/ Patient/
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/doctor-review-dashboard/ Doctors/
+          rsync -a --delete --exclude='.git' --exclude='.env' --exclude='.env.*' --exclude='node_modules' --exclude='.gradle' /tmp/medical/ Admin/
+
+      - name: Validate imported applications
+        shell: bash
+        run: |
+          set -euo pipefail
+          for folder in Patient Doctors Admin; do
+            if ! find "$folder" -type f -print -quit | grep -q .; then
+              echo "::error::$folder is empty; import aborted."
+              exit 1
+            fi
+            echo "$folder: $(find "$folder" -type f | wc -l | tr -d ' ') files"
+          done
+          if find Patient Doctors Admin -type f -name '.env*' -print -quit | grep -q .; then
+            echo "::error::Environment files detected; import aborted."
+            exit 1
+          fi
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A -- Patient Doctors Admin
+          if git diff --cached --quiet; then
+            echo "No changes detected; destination already matches source repositories."
+            exit 0
+          fi
+          git commit -m "Import patient, doctor, and admin applications"
+          git push origin HEAD:main
