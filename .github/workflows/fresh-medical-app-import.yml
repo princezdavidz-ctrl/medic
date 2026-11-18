@@ -26,13 +26,32 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Clone source repositories
-        shell: bash
-        run: |
-          set -euo pipefail
-          git clone --depth 1 https://github.com/princezdavidz-ctrl/medical2.git /tmp/medical2
-          git clone --depth 1 https://github.com/princezdavidz-ctrl/doctor-review-dashboard.git /tmp/doctor-review-dashboard
-          git clone --depth 1 https://github.com/princezdavidz-ctrl/medical.git /tmp/medical
+      # These repositories require authentication. Add a fine-grained PAT as
+      # repository secret SOURCE_REPOS_TOKEN with Contents: Read access to all
+      # three source repositories.
+      - name: Checkout patient source
+        uses: actions/checkout@v4
+        with:
+          repository: princezdavidz-ctrl/medical2
+          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          path: /tmp/medical2
+          fetch-depth: 1
+
+      - name: Checkout doctor source
+        uses: actions/checkout@v4
+        with:
+          repository: princezdavidz-ctrl/doctor-review-dashboard
+          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          path: /tmp/doctor-review-dashboard
+          fetch-depth: 1
+
+      - name: Checkout admin source
+        uses: actions/checkout@v4
+        with:
+          repository: princezdavidz-ctrl/medical
+          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          path: /tmp/medical
+          fetch-depth: 1
 
       - name: Import into Patient, Doctors, and Admin
         shell: bash
