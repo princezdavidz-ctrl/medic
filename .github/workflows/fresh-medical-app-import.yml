@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/medical2
+          ref: main
           token: ${{ secrets.movement }}
           path: .source/medical2
           fetch-depth: 1
@@ -40,6 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/doctor-review-dashboard
+          ref: main
           token: ${{ secrets.movement }}
           path: .source/doctor-review-dashboard
           fetch-depth: 1
@@ -48,6 +50,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/medical
+          ref: main
           token: ${{ secrets.movement }}
           path: .source/medical
           fetch-depth: 1
