@@ -26,14 +26,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # These repositories require authentication. Add a fine-grained PAT as
-      # repository secret SOURCE_REPOS_TOKEN with Contents: Read access to all
-      # three source repositories.
+      # The movement repository secret must be a fine-grained PAT with
+      # Contents: Read access to all three source repositories.
       - name: Checkout patient source
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/medical2
-          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          token: ${{ secrets.movement }}
           path: /tmp/medical2
           fetch-depth: 1
 
@@ -41,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/doctor-review-dashboard
-          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          token: ${{ secrets.movement }}
           path: /tmp/doctor-review-dashboard
           fetch-depth: 1
 
@@ -49,7 +48,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: princezdavidz-ctrl/medical
-          token: ${{ secrets.SOURCE_REPOS_TOKEN }}
+          token: ${{ secrets.movement }}
           path: /tmp/medical
           fetch-depth: 1
 
